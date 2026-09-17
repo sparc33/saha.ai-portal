@@ -1,0 +1,81 @@
+<!-- AI Disclaimer — regulatory requirement AC-031.8.
+     MUST be always visible. MUST NOT be inside *ngIf or any conditional.
+     MUST NOT have a close/dismiss button. -->
+<div class="ai-disclaimer" role="alert">
+  This portal uses AI to assist with clinical intake. AI suggestions are not a substitute
+  for professional medical advice. Contact your care team in case of emergency.
+</div>
+
+<div class="login-container">
+  <h1>Patient Login</h1>
+
+  <!-- Identifier type toggle -->
+  <div class="identifier-toggle" role="group" aria-label="Choose identifier type">
+    <button
+      type="button"
+      [class.active]="identifierType === 'mrNumber'"
+      (click)="switchType('mrNumber')">
+      MR Number
+    </button>
+    <button
+      type="button"
+      [class.active]="identifierType === 'phone'"
+      (click)="switchType('phone')">
+      Phone Number
+    </button>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-field">
+      <label for="identifierValue">
+        {{ identifierType === 'mrNumber' ? 'Medical Record Number' : 'Phone Number' }}
+      </label>
+      <input
+        id="identifierValue"
+        formControlName="identifierValue"
+        [attr.inputmode]="identifierType === 'phone' ? 'tel' : 'text'"
+        [placeholder]="identifierType === 'mrNumber' ? 'e.g. MR1234567' : 'e.g. 9876543210'"
+        autocomplete="off"
+        aria-required="true"
+        [attr.aria-describedby]="
+          (loginForm.get('identifierValue')?.invalid && loginForm.get('identifierValue')?.touched)
+            ? 'identifier-error'
+            : null
+        "
+      />
+
+      <span
+        id="identifier-error"
+        class="error"
+        *ngIf="loginForm.get('identifierValue')?.invalid && loginForm.get('identifierValue')?.touched"
+        aria-live="polite">
+        <ng-container *ngIf="loginForm.get('identifierValue')?.errors?.['required']">
+          Please enter your {{ identifierType === 'mrNumber' ? 'MR number' : 'phone number' }}.
+        </ng-container>
+        <ng-container *ngIf="loginForm.get('identifierValue')?.errors?.['pattern']">
+          Please enter a valid
+          {{ identifierType === 'mrNumber' ? 'MR number (e.g. MR1234567)' : 'phone number (10 digits starting with 6-9)' }}.
+        </ng-container>
+      </span>
+    </div>
+
+    <!-- API-level error — generic only, NEVER confirms/denies whether a record exists (PHI hard stop). -->
+    <span class="error api-error" *ngIf="apiError" role="alert">{{ apiError }}</span>
+
+    <!-- Account lockout state — shown when backend returns 403 + ACCOUNT_LOCKED.
+         PHI hard stop: message text sourced from LOCKOUT_MESSAGES only, never from server response. -->
+    <div *ngIf="isAccountLocked" class="lockout-message" role="alert" aria-live="assertive">
+      <p>{{ lockoutMessage }}</p>
+    </div>
+
+    <!-- Session throttle state — shown when backend returns 429.
+         PHI hard stop: message text sourced from LOCKOUT_MESSAGES only, never from server response. -->
+    <div *ngIf="throttleMessage" class="throttle-message" role="alert" aria-live="polite">
+      <p>{{ throttleMessage }}</p>
+    </div>
+
+    <button type="submit" [disabled]="isAccountLocked || isLoading">
+      {{ isLoading ? 'Sending…' : 'Send one-time code' }}
+    </button>
+  </form>
+</div>

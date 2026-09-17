@@ -1,0 +1,88 @@
+<div class="identity-container">
+  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
+  <div class="ai-disclaimer" role="alert">
+    <strong>&#9888; AI Notice:</strong>
+    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
+    A clinician will review all information.
+  </div>
+
+  <div class="identity-card">
+    <h1 class="page-heading">Let's Check You In</h1>
+    <p class="page-sub">
+      If you've visited us before, we can pre-fill some information for you.
+    </p>
+
+    <form [formGroup]="identityForm" (ngSubmit)="onSubmit()" novalidate>
+      <!-- Date of Birth -->
+      <div class="form-group">
+        <label for="dateOfBirth" class="form-label">Date of Birth</label>
+        <input
+          id="dateOfBirth"
+          type="date"
+          formControlName="dateOfBirth"
+          class="form-input"
+          [class.input-error]="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched"
+          aria-required="true"
+        />
+        <span
+          *ngIf="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched"
+          class="field-error">
+          Date of birth is required.
+        </span>
+      </div>
+
+      <!-- Identifier Type Radio -->
+      <div class="form-group">
+        <fieldset class="radio-group">
+          <legend class="form-label">Identify With</legend>
+          <label class="radio-label">
+            <input type="radio" formControlName="identifierType" value="mrNumber" />
+            Medical Record Number
+          </label>
+          <label class="radio-label">
+            <input type="radio" formControlName="identifierType" value="phone" />
+            Phone Number
+          </label>
+        </fieldset>
+      </div>
+
+      <!-- Conditional Identifier Input -->
+      <div class="form-group">
+        <label for="identifier" class="form-label">{{ identifierLabel }}</label>
+        <input
+          id="identifier"
+          type="text"
+          formControlName="identifier"
+          class="form-input"
+          [placeholder]="identifierPlaceholder"
+          [class.input-error]="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched"
+          aria-required="true"
+        />
+        <span
+          *ngIf="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched"
+          class="field-error">
+          {{ identifierLabel }} is required.
+        </span>
+      </div>
+
+      <!-- Error Block — generic only, PHI-safe -->
+      <div *ngIf="errorMessage" class="error-block" role="alert">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Checking&hellip;' : 'Continue' }}
+      </button>
+    </form>
+
+    <button
+      type="button"
+      class="skip-link"
+      (click)="skipToChat()">
+      Skip (first visit)
+    </button>
+  </div>
+</div>

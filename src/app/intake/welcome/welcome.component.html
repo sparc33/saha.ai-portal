@@ -1,0 +1,37 @@
+<div class="welcome-container">
+  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
+  <div class="ai-disclaimer" role="alert">
+    <strong>&#9888; AI Notice:</strong>
+    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
+    A clinician will review all information.
+  </div>
+
+  <div class="welcome-card">
+    <div class="clinic-logo" aria-hidden="true">&#9829;</div>
+
+    <ng-container *ngIf="isLoading">
+      <p class="loading-text">Preparing your check-in&hellip;</p>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoading && !errorMessage">
+      <h1 class="welcome-heading">Welcome to {{ clinicName }} Check-In</h1>
+      <p class="welcome-sub">
+        Before you see your clinician, our AI assistant will ask a few questions
+        about what brings you in today.
+      </p>
+      <button
+        class="btn btn-primary"
+        (click)="beginCheckIn()"
+        [disabled]="isLoading">
+        Begin Check-In
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoading && errorMessage">
+      <p class="error-message" role="alert">{{ errorMessage }}</p>
+      <button class="btn btn-secondary" (click)="createSession()">
+        Try Again
+      </button>
+    </ng-container>
+  </div>
+</div>

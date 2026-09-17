@@ -1,0 +1,163 @@
+<div class="history-container">
+  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
+  <div class="ai-disclaimer" role="alert">
+    <strong>&#9888; AI Notice:</strong>
+    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
+    A clinician will review all information.
+  </div>
+
+  <div class="history-card">
+    <h1 class="page-heading">Your Health Information</h1>
+    <p class="page-sub">Please review and confirm your records on file.</p>
+
+    <ng-container *ngIf="isLoading">
+      <p class="loading-text">Loading your records&hellip;</p>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoading">
+      <div *ngIf="errorMessage" class="error-block" role="alert">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Allergies Section -->
+      <div class="section-card" [class.section-acknowledged]="sections.allergies.acknowledged">
+        <div class="section-header">
+          <h2 class="section-title">Your Allergies</h2>
+          <span *ngIf="sections.allergies.acknowledged" class="checkmark" aria-label="Confirmed">&#10003;</span>
+        </div>
+
+        <ng-container *ngIf="!sections.allergies.editing">
+          <ul *ngIf="sections.allergies.items.length > 0; else noAllergies" class="items-list">
+            <li *ngFor="let item of sections.allergies.items">{{ item }}</li>
+          </ul>
+          <ng-template #noAllergies>
+            <p class="no-records">No records on file</p>
+          </ng-template>
+          <div class="section-actions">
+            <button class="btn btn-confirm" (click)="confirmSection('allergies')" *ngIf="!sections.allergies.acknowledged">
+              Confirm
+            </button>
+            <button class="btn btn-edit" (click)="startEdit('allergies')">
+              Edit
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="sections.allergies.editing">
+          <div *ngFor="let item of sections.allergies.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
+            <input
+              type="text"
+              class="edit-input"
+              [(ngModel)]="sections.allergies.editItems[i]"
+              [name]="'allergy-' + i"
+              placeholder="Enter allergy"
+            />
+            <button class="btn-remove" (click)="removeItem('allergies', i)" aria-label="Remove">&#10005;</button>
+          </div>
+          <button class="btn btn-add" (click)="addItem('allergies')">+ Add</button>
+          <div class="section-actions">
+            <button class="btn btn-save" (click)="saveSection('allergies')" [disabled]="sections.allergies.saving">
+              {{ sections.allergies.saving ? 'Saving&hellip;' : 'Save' }}
+            </button>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Conditions Section -->
+      <div class="section-card" [class.section-acknowledged]="sections.conditions.acknowledged">
+        <div class="section-header">
+          <h2 class="section-title">Your Conditions</h2>
+          <span *ngIf="sections.conditions.acknowledged" class="checkmark" aria-label="Confirmed">&#10003;</span>
+        </div>
+
+        <ng-container *ngIf="!sections.conditions.editing">
+          <ul *ngIf="sections.conditions.items.length > 0; else noConditions" class="items-list">
+            <li *ngFor="let item of sections.conditions.items">{{ item }}</li>
+          </ul>
+          <ng-template #noConditions>
+            <p class="no-records">No records on file</p>
+          </ng-template>
+          <div class="section-actions">
+            <button class="btn btn-confirm" (click)="confirmSection('conditions')" *ngIf="!sections.conditions.acknowledged">
+              Confirm
+            </button>
+            <button class="btn btn-edit" (click)="startEdit('conditions')">
+              Edit
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="sections.conditions.editing">
+          <div *ngFor="let item of sections.conditions.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
+            <input
+              type="text"
+              class="edit-input"
+              [(ngModel)]="sections.conditions.editItems[i]"
+              [name]="'condition-' + i"
+              placeholder="Enter condition"
+            />
+            <button class="btn-remove" (click)="removeItem('conditions', i)" aria-label="Remove">&#10005;</button>
+          </div>
+          <button class="btn btn-add" (click)="addItem('conditions')">+ Add</button>
+          <div class="section-actions">
+            <button class="btn btn-save" (click)="saveSection('conditions')" [disabled]="sections.conditions.saving">
+              {{ sections.conditions.saving ? 'Saving&hellip;' : 'Save' }}
+            </button>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Medications Section -->
+      <div class="section-card" [class.section-acknowledged]="sections.medications.acknowledged">
+        <div class="section-header">
+          <h2 class="section-title">Your Medications</h2>
+          <span *ngIf="sections.medications.acknowledged" class="checkmark" aria-label="Confirmed">&#10003;</span>
+        </div>
+
+        <ng-container *ngIf="!sections.medications.editing">
+          <ul *ngIf="sections.medications.items.length > 0; else noMedications" class="items-list">
+            <li *ngFor="let item of sections.medications.items">{{ item }}</li>
+          </ul>
+          <ng-template #noMedications>
+            <p class="no-records">No records on file</p>
+          </ng-template>
+          <div class="section-actions">
+            <button class="btn btn-confirm" (click)="confirmSection('medications')" *ngIf="!sections.medications.acknowledged">
+              Confirm
+            </button>
+            <button class="btn btn-edit" (click)="startEdit('medications')">
+              Edit
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="sections.medications.editing">
+          <div *ngFor="let item of sections.medications.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
+            <input
+              type="text"
+              class="edit-input"
+              [(ngModel)]="sections.medications.editItems[i]"
+              [name]="'medication-' + i"
+              placeholder="Enter medication"
+            />
+            <button class="btn-remove" (click)="removeItem('medications', i)" aria-label="Remove">&#10005;</button>
+          </div>
+          <button class="btn btn-add" (click)="addItem('medications')">+ Add</button>
+          <div class="section-actions">
+            <button class="btn btn-save" (click)="saveSection('medications')" [disabled]="sections.medications.saving">
+              {{ sections.medications.saving ? 'Saving&hellip;' : 'Save' }}
+            </button>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Proceed Button -->
+      <button
+        class="btn btn-proceed"
+        (click)="proceed()"
+        [disabled]="!allAcknowledged">
+        {{ allAcknowledged ? 'Proceed to Check-In' : 'Confirm all sections to proceed' }}
+      </button>
+    </ng-container>
+  </div>
+</div>

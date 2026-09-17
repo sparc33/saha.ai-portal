@@ -1,0 +1,90 @@
+<div class="note-container">
+  <!-- Back Button -->
+  <button class="back-btn" (click)="goBack()">
+    &larr; Back to Queue
+  </button>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-text">Loading patient note&hellip;</div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !isLoading" class="error-block" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Note Content -->
+  <ng-container *ngIf="!isLoading && noteData">
+    <!-- Note Header -->
+    <div class="note-header">
+      <span
+        class="urgency-badge"
+        [ngStyle]="{ 'background-color': urgencyColor(noteData.urgencyLevel) }">
+        {{ urgencyLabel(noteData.urgencyLevel) }}
+      </span>
+      <h1 class="note-title">Patient Note</h1>
+    </div>
+
+    <!-- Red Flag Alert -->
+    <div *ngIf="noteData.redFlagDetected" class="red-flag-alert" role="alert">
+      <strong>&#9888; RED FLAG DETECTED:</strong>
+      {{ noteData.structuredNote.redFlagsFound }}
+    </div>
+
+    <!-- Prominent AI Disclaimer -->
+    <div class="ai-disclaimer" role="alert">
+      <strong>&#9888; AI-Generated Note:</strong>
+      This note is AI-generated decision support. It is <strong>NOT</strong> a diagnosis.
+      Clinician makes all clinical decisions.
+    </div>
+
+    <!-- Structured Note Cards -->
+    <div class="note-card">
+      <h2 class="card-title">Chief Complaint</h2>
+      <p class="card-content">{{ noteData.structuredNote.chiefComplaint || '—' }}</p>
+    </div>
+
+    <div class="note-card">
+      <h2 class="card-title">History of Present Illness</h2>
+      <p class="card-content">{{ noteData.structuredNote.historyOfPresentIllness || '—' }}</p>
+    </div>
+
+    <div class="note-card">
+      <h2 class="card-title">Relevant History</h2>
+      <p class="card-content">{{ noteData.structuredNote.relevantHistory || '—' }}</p>
+    </div>
+
+    <div class="note-card" *ngIf="noteData.structuredNote.redFlagsFound">
+      <h2 class="card-title card-title--danger">Red Flags Found</h2>
+      <p class="card-content">{{ noteData.structuredNote.redFlagsFound }}</p>
+    </div>
+
+    <div class="note-card">
+      <h2 class="card-title">Triage Rationale</h2>
+      <div class="triage-level">
+        <span
+          class="urgency-badge urgency-badge--inline"
+          [ngStyle]="{ 'background-color': urgencyColor(noteData.urgencyLevel) }">
+          {{ urgencyLabel(noteData.urgencyLevel) }}
+        </span>
+      </div>
+      <p class="card-content">{{ noteData.structuredNote.urgencyRationale || '—' }}</p>
+    </div>
+
+    <!-- Urgency Rubric Reference -->
+    <div class="urgency-rubric">
+      <strong>Urgency Reference:</strong>
+      Routine = stable, non-urgent &nbsp;|&nbsp;
+      Urgent = needs same-day care &nbsp;|&nbsp;
+      Emergency = immediate threat
+    </div>
+
+    <!-- Footer Disclaimer -->
+    <div class="note-footer-disclaimer">
+      This note is AI-generated decision support. It is NOT a diagnosis. Clinician makes all clinical decisions.
+    </div>
+
+    <button class="back-btn back-btn--bottom" (click)="goBack()">
+      &larr; Back to Queue
+    </button>
+  </ng-container>
+</div>

@@ -1,0 +1,70 @@
+<div class="chat-container">
+  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf, sticky at top -->
+  <div class="ai-disclaimer" role="alert">
+    <strong>&#9888; AI Notice:</strong>
+    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
+    A clinician will review all information.
+  </div>
+
+  <!-- Emergency Overlay — always in DOM, toggled with [hidden] not *ngIf -->
+  <div class="emergency-overlay" [hidden]="!isEmergency" role="alert" aria-live="assertive">
+    <div class="emergency-content">
+      <div class="emergency-icon">&#9888;</div>
+      <h2>EMERGENCY</h2>
+      <p>
+        &#9888; EMERGENCY: Please notify clinic staff immediately or call 911.
+      </p>
+    </div>
+  </div>
+
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <h1 class="chat-title">Intake Assistant</h1>
+  </div>
+
+  <!-- Session Timeout Warning -->
+  <div *ngIf="showTimeoutWarning" class="timeout-warning" role="alert">
+    Your session will expire in {{ formattedRemaining }}. Please complete your intake.
+  </div>
+
+  <!-- Message List -->
+  <div class="message-list" #messageList>
+    <div
+      *ngFor="let message of messages"
+      class="message-row"
+      [class.message-row--patient]="message.role === 'patient'"
+      [class.message-row--ai]="message.role === 'ai'">
+      <div
+        class="message-bubble"
+        [class.bubble-patient]="message.role === 'patient'"
+        [class.bubble-ai]="message.role === 'ai'">
+        {{ message.content }}
+      </div>
+    </div>
+    <div *ngIf="isSending" class="message-row message-row--ai">
+      <div class="message-bubble bubble-ai typing-indicator">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-area">
+    <textarea
+      class="message-input"
+      [(ngModel)]="inputText"
+      (keydown)="onKeydown($event)"
+      [disabled]="inputDisabled"
+      placeholder="Type your message here&hellip;"
+      rows="2"
+      aria-label="Your message">
+    </textarea>
+    <button
+      class="send-btn"
+      (click)="sendMessage()"
+      [disabled]="inputDisabled || !inputText.trim()"
+      aria-label="Send message">
+      Send
+    </button>
+  </div>
+</div>

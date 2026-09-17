@@ -1,0 +1,77 @@
+<div class="queue-container">
+  <!-- Header -->
+  <div class="queue-header">
+    <h1 class="queue-title">{{ clinicName }} &mdash; Clinician Queue</h1>
+    <span class="last-refreshed" *ngIf="lastRefreshed">
+      Last updated: {{ lastRefreshed | date:'h:mm:ss a' }}
+    </span>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs" role="tablist">
+    <button
+      *ngFor="let tab of filterTabs"
+      class="filter-tab"
+      [class.filter-tab--active]="activeFilter === tab.value"
+      [attr.data-urgency]="tab.value"
+      (click)="setFilter(tab.value)"
+      role="tab"
+      [attr.aria-selected]="activeFilter === tab.value">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-text">Loading queue&hellip;</div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-block" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Queue Table -->
+  <ng-container *ngIf="!isLoading">
+    <div *ngIf="filteredQueue.length === 0" class="empty-state">
+      No completed intakes yet.
+    </div>
+
+    <table *ngIf="filteredQueue.length > 0" class="queue-table">
+      <thead>
+        <tr>
+          <th>Urgency</th>
+          <th>Patient Type</th>
+          <th>Chief Complaint</th>
+          <th>Time In</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of filteredQueue"
+          class="queue-row"
+          (click)="openNote(item.sessionId)"
+          tabindex="0"
+          (keydown.enter)="openNote(item.sessionId)"
+          role="button"
+          [attr.aria-label]="'View note for session ' + item.sessionId">
+          <td>
+            <span
+              class="urgency-badge"
+              [ngStyle]="{ 'background-color': urgencyColor(item.urgencyLevel) }">
+              {{ urgencyLabel(item.urgencyLevel) }}
+            </span>
+          </td>
+          <td class="patient-type">{{ item.patientType === 'returning' ? 'Returning' : 'New' }}</td>
+          <td class="chief-complaint">{{ item.chiefComplaint || '—' }}</td>
+          <td class="time-in">{{ formatTime(item.createdAt) }}</td>
+          <td class="queue-status">{{ item.queueStatus }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+  <!-- Disclaimer Footer -->
+  <div class="disclaimer-footer">
+    All information is AI-generated decision support. Clinician review required.
+  </div>
+</div>

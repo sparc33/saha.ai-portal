@@ -1,0 +1,73 @@
+<!-- OTP Entry Screen — VAN-37
+     PHI hard stops:
+     - Only ****{{ maskedPhone }} is shown (last 4 digits) — full phone NEVER rendered.
+     - errorMessage is always a hardcoded string — never server-response text.
+     - OTP value is submitted via (ngSubmit) → POST body only; never in URL. -->
+
+<div class="otp-entry-container">
+  <h1>Enter Verification Code</h1>
+
+  <!-- Masked phone display — phone flow shows last 4 digits only -->
+  <p *ngIf="maskedPhone !== null; else mrFlow" class="contact-hint">
+    Code sent to ****{{ maskedPhone }}
+  </p>
+  <ng-template #mrFlow>
+    <p class="contact-hint">Code sent to your registered contact.</p>
+  </ng-template>
+
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-field">
+      <label for="otpInput">One-time code</label>
+      <input
+        id="otpInput"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        autocomplete="one-time-code"
+        [value]="otpValue"
+        (input)="onDigitInput($event)"
+        aria-label="Enter your 6-digit verification code"
+        [attr.aria-describedby]="errorMessage ? 'otp-error' : null"
+        [disabled]="isOtpLocked"
+      />
+    </div>
+
+    <!-- Error display — hardcoded strings only, NEVER server-provided text (PHI hard stop) -->
+    <div
+      id="otp-error"
+      role="alert"
+      aria-live="assertive"
+      class="error-message"
+      *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- OTP lockout state — shown when backend returns 403 + ACCOUNT_LOCKED after max OTP attempts.
+         PHI hard stop: message text sourced from LOCKOUT_MESSAGES only, never from server response. -->
+    <div *ngIf="isOtpLocked" class="lockout-message" role="alert" aria-live="assertive">
+      <p>{{ otpLockoutMessage }}</p>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="isOtpLocked || otpValue.length < 6 || isLoading">
+      {{ isLoading ? 'Verifying...' : 'Verify Code' }}
+    </button>
+  </form>
+
+  <div class="resend-section">
+    <p *ngIf="countdownSeconds > 0" class="countdown">
+      Resend available in {{ countdownSeconds }}s
+    </p>
+    <button
+      type="button"
+      class="resend-btn"
+      [disabled]="resendDisabled || resendLoading"
+      (click)="onResend()">
+      {{ resendLoading ? 'Sending...' : 'Resend Code' }}
+    </button>
+  </div>
+
+  <a routerLink="/login" class="back-link">Back to login</a>
+</div>

@@ -1,0 +1,23 @@
+<div class="completion-container">
+  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
+  <div class="ai-disclaimer" role="alert">
+    <strong>&#9888; AI Notice:</strong>
+    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
+    A clinician will review all information.
+  </div>
+
+  <div class="completion-card">
+    <div class="checkmark-icon" aria-hidden="true">&#10003;</div>
+
+    <h1 class="completion-heading">Thank You &mdash; Check-In Complete</h1>
+
+    <p class="completion-message">
+      Your information has been submitted. A clinician will review it shortly.
+      Please take a seat &mdash; you'll be called when ready.
+    </p>
+
+    <div class="reset-notice">
+      This screen will reset in {{ formattedRemaining }} for the next patient.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<form class="composer" (ngSubmit)="onSubmit()">
+  <label for="chat-message-input" class="sr-only">Type your message</label>
+  <textarea
+    id="chat-message-input"
+    class="composer__textarea"
+    name="message"
+    rows="1"
+    placeholder="Describe your symptoms or ask a question..."
+    [(ngModel)]="draft"
+    [disabled]="disabled()"
+    (keydown)="onKeydown($event)"
+    aria-label="Type your message"
+  ></textarea>
+  <button
+    type="submit"
+    class="composer__send"
+    [disabled]="disabled() || !draft().trim()"
+    aria-label="Send message"
+  >
+    Send
+  </button>
+</form>

@@ -1,0 +1,29 @@
+<div class="message-list" role="log" aria-live="polite" aria-label="Conversation history">
+  @for (msg of messages(); track msg.id) {
+    <div
+      class="message-row"
+      [class.message-row--user]="msg.role === 'user'"
+      [class.message-row--assistant]="msg.role === 'assistant'"
+      [class.message-row--notice]="msg.role === 'system-notice'"
+    >
+      <div class="bubble">
+        <p class="bubble__text">{{ msg.text }}</p>
+        <span class="bubble__time">{{ formatTime(msg.timestamp) }}</span>
+      </div>
+    </div>
+  } @empty {
+    <p class="message-list__empty">Say hello to start your intake conversation.</p>
+  }
+
+  @if (isLoading()) {
+    <div class="message-row message-row--assistant" aria-live="polite">
+      <div class="bubble bubble--typing" aria-label="Assistant is typing">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    </div>
+  }
+
+  <div #scrollAnchor></div>
+</div>

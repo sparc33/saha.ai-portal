@@ -1,0 +1,30 @@
+<section class="chat-card" aria-label="Clinical intake assistant chat">
+  <header class="chat-card__header">
+    <div class="chat-card__title">
+      <span class="chat-card__badge" aria-hidden="true">+</span>
+      <div>
+        <h1>AI Clinical Intake &amp; Triage Assistant</h1>
+        <p class="chat-card__subtitle">Not a substitute for professional medical advice</p>
+      </div>
+    </div>
+    <button type="button" class="chat-card__reset" (click)="onReset()">
+      New conversation
+    </button>
+  </header>
+
+  <app-patient-history-panel
+    [locked]="hasSession()"
+    [summary]="patientHistory()"
+    (save)="onSavePatientHistory($event)"
+  />
+
+  <app-message-list [messages]="messages()" [isLoading]="isLoading()" />
+
+  @if (error()) {
+    <div class="chat-card__error" role="alert">
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <app-message-input [disabled]="isLoading()" (send)="onSend($event)" />
+</section>

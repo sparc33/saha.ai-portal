@@ -1,0 +1,25 @@
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(180deg, #eaf3f2 0%, #eef2f6 100%);
+  color: #1e293b;
+}
+
+app-root {
+  display: block;
+  height: 100%;
+}
+
+button {
+  font-family: inherit;
+}

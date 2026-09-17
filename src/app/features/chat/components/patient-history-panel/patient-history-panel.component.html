@@ -1,0 +1,82 @@
+@if (locked()) {
+  @if (summary()) {
+    <div class="ph-chip" role="status">
+      <span class="ph-chip__icon" aria-hidden="true">i</span>
+      Patient history provided
+    </div>
+  }
+} @else {
+  <div class="ph-panel">
+    @if (!expanded()) {
+      <button type="button" class="ph-toggle" (click)="toggleExpanded()">
+        <span aria-hidden="true">+</span> Add patient history
+        <span class="ph-toggle__hint">— returning patient?</span>
+      </button>
+    } @else {
+      <form class="ph-form" (ngSubmit)="onSave()">
+        <div class="ph-form__header">
+          <h2>Patient history <span class="ph-form__optional">(optional)</span></h2>
+          <button
+            type="button"
+            class="ph-form__collapse"
+            (click)="toggleExpanded()"
+            aria-label="Collapse patient history panel"
+          >
+            Hide
+          </button>
+        </div>
+
+        <div class="ph-field">
+          <label for="ph-allergies">Allergies</label>
+          <input
+            id="ph-allergies"
+            type="text"
+            name="allergies"
+            [(ngModel)]="allergiesText"
+            placeholder="e.g. penicillin, peanuts"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="ph-field">
+          <label for="ph-conditions">Chronic conditions</label>
+          <input
+            id="ph-conditions"
+            type="text"
+            name="chronicConditions"
+            [(ngModel)]="chronicText"
+            placeholder="e.g. migraine, hypertension"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="ph-field">
+          <label for="ph-medications">Current medications</label>
+          <input
+            id="ph-medications"
+            type="text"
+            name="medications"
+            [(ngModel)]="medicationsText"
+            placeholder="e.g. sumatriptan as needed"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="ph-field">
+          <label for="ph-notes">Notes</label>
+          <textarea
+            id="ph-notes"
+            name="notes"
+            rows="2"
+            [(ngModel)]="notes"
+            placeholder="Anything else the assistant should know..."
+          ></textarea>
+        </div>
+
+        <div class="ph-form__actions">
+          <button type="submit" class="ph-form__save">Save</button>
+        </div>
+      </form>
+    }
+  </div>
+}

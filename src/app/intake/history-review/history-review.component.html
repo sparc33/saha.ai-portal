@@ -110,6 +110,7 @@
           <button class="btn-save" (click)="saveSection('allergies')" [disabled]="sections.allergies.saving">
             {{ sections.allergies.saving ? 'Saving…' : 'Save & Confirm' }}
           </button>
+          <p *ngIf="sections.allergies.saveError" class="section__save-error" role="alert">{{ sections.allergies.saveError }}</p>
         </div>
       </div>
 
@@ -161,6 +162,7 @@
           <button class="btn-save" (click)="saveSection('conditions')" [disabled]="sections.conditions.saving">
             {{ sections.conditions.saving ? 'Saving…' : 'Save & Confirm' }}
           </button>
+          <p *ngIf="sections.conditions.saveError" class="section__save-error" role="alert">{{ sections.conditions.saveError }}</p>
         </div>
       </div>
 
@@ -212,6 +214,7 @@
           <button class="btn-save" (click)="saveSection('medications')" [disabled]="sections.medications.saving">
             {{ sections.medications.saving ? 'Saving…' : 'Save & Confirm' }}
           </button>
+          <p *ngIf="sections.medications.saveError" class="section__save-error" role="alert">{{ sections.medications.saveError }}</p>
         </div>
       </div>
 

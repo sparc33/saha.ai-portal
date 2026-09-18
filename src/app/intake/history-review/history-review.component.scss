@@ -410,6 +410,13 @@ $shimmer-gradient: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%)
   &:disabled { opacity: 0.65; cursor: not-allowed; }
 }
 
+.section__save-error {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--c-danger);
+  font-weight: 500;
+}
+
 /* ── Proceed button ───────────────────────────────────────────── */
 .btn-proceed {
   display: flex;

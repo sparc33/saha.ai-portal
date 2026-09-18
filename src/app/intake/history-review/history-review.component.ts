@@ -12,6 +12,7 @@ interface SectionState {
   editing: boolean;
   acknowledged: boolean;
   saving: boolean;
+  saveError: string;
 }
 
 /**
@@ -37,9 +38,9 @@ export class HistoryReviewComponent implements OnInit {
   errorMessage = '';
 
   sections: Record<Section, SectionState> = {
-    allergies: { items: [], editItems: [], editing: false, acknowledged: false, saving: false },
-    conditions: { items: [], editItems: [], editing: false, acknowledged: false, saving: false },
-    medications: { items: [], editItems: [], editing: false, acknowledged: false, saving: false }
+    allergies: { items: [], editItems: [], editing: false, acknowledged: false, saving: false, saveError: '' },
+    conditions: { items: [], editItems: [], editing: false, acknowledged: false, saving: false, saveError: '' },
+    medications: { items: [], editItems: [], editing: false, acknowledged: false, saving: false, saveError: '' }
   };
 
   get allAcknowledged(): boolean {
@@ -111,11 +112,8 @@ export class HistoryReviewComponent implements OnInit {
         s.saving = false;
       },
       error: () => {
-        // Optimistic update — still mark acknowledged so patient can proceed
-        s.items = cleanedItems;
-        s.editing = false;
-        s.acknowledged = true;
         s.saving = false;
+        s.saveError = 'Unable to save changes. Please try again.';
       }
     });
   }

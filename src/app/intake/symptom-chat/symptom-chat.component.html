@@ -1,70 +1,62 @@
-<div class="chat-container">
-  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf, sticky at top -->
-  <div class="ai-disclaimer" role="alert">
-    <strong>&#9888; AI Notice:</strong>
-    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
-    A clinician will review all information.
+<div class="chat-page">
+  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
+  <div class="ai-disclaimer" role="note" aria-label="AI notice">
+    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    <span><strong>AI Notice:</strong> This is an AI intake assistant — not a medical diagnosis. A clinician reviews all information.</span>
   </div>
 
   <!-- Emergency Overlay — always in DOM, toggled with [hidden] not *ngIf -->
   <div class="emergency-overlay" [hidden]="!isEmergency" role="alert" aria-live="assertive">
-    <div class="emergency-content">
-      <div class="emergency-icon">&#9888;</div>
-      <h2>EMERGENCY</h2>
-      <p>
-        &#9888; EMERGENCY: Please notify clinic staff immediately or call 911.
-      </p>
+    <div class="emergency-overlay__content">
+      <div class="emergency-overlay__pulse" aria-hidden="true"></div>
+      <svg class="emergency-overlay__icon" viewBox="0 0 48 48" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4zm0 22a2 2 0 01-2-2V16a2 2 0 014 0v8a2 2 0 01-2 2zm2 6a2 2 0 11-4 0 2 2 0 014 0z" clip-rule="evenodd"/>
+      </svg>
+      <h2 class="emergency-overlay__heading">EMERGENCY</h2>
+      <p class="emergency-overlay__body">Please notify clinic staff immediately<br>or call <strong>911</strong></p>
     </div>
   </div>
 
-  <!-- Chat Header -->
-  <div class="chat-header">
-    <h1 class="chat-title">Intake Assistant</h1>
+  <header class="chat-header">
+    <div class="chat-header__brand">
+      <svg class="chat-header__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5v4m0 0v4m0-4h4m-4 0H8"/>
+      </svg>
+      <span class="chat-header__name">Intake Assistant</span>
+    </div>
+    <div class="chat-header__meta">
+      <span class="patient-badge" [class.patient-badge--returning]="patientType === 'returning'">
+        {{ patientType === 'returning' ? 'Returning Patient' : 'New Patient' }}
+      </span>
+    </div>
+  </header>
+
+  <div *ngIf="showTimeoutWarning" class="timeout-bar" role="alert" aria-live="assertive">
+    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+    Session expires in <strong>{{ formattedRemaining }}</strong> — please complete your intake.
   </div>
 
-  <!-- Session Timeout Warning -->
-  <div *ngIf="showTimeoutWarning" class="timeout-warning" role="alert">
-    Your session will expire in {{ formattedRemaining }}. Please complete your intake.
-  </div>
-
-  <!-- Message List -->
-  <div class="message-list" #messageList>
-    <div
-      *ngFor="let message of messages"
-      class="message-row"
-      [class.message-row--patient]="message.role === 'patient'"
-      [class.message-row--ai]="message.role === 'ai'">
-      <div
-        class="message-bubble"
-        [class.bubble-patient]="message.role === 'patient'"
-        [class.bubble-ai]="message.role === 'ai'">
-        {{ message.content }}
+  <div class="message-list" #messageList role="log" aria-live="polite" aria-label="Conversation">
+    <div *ngFor="let message of messages" class="message-row" [class.message-row--patient]="message.role === 'patient'" [class.message-row--ai]="message.role === 'ai'">
+      <div *ngIf="message.role === 'ai'" class="avatar avatar--ai" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5v4m0 0v4m0-4h4m-4 0H8"/></svg>
       </div>
+      <div class="bubble" [class.bubble--patient]="message.role === 'patient'" [class.bubble--ai]="message.role === 'ai'">{{ message.content }}</div>
     </div>
     <div *ngIf="isSending" class="message-row message-row--ai">
-      <div class="message-bubble bubble-ai typing-indicator">
-        <span></span><span></span><span></span>
+      <div class="avatar avatar--ai" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5v4m0 0v4m0-4h4m-4 0H8"/></svg>
       </div>
+      <div class="bubble bubble--ai bubble--typing" aria-label="Assistant is typing"><span></span><span></span><span></span></div>
     </div>
   </div>
 
-  <!-- Input Area -->
-  <div class="input-area">
-    <textarea
-      class="message-input"
-      [(ngModel)]="inputText"
-      (keydown)="onKeydown($event)"
-      [disabled]="inputDisabled"
-      placeholder="Type your message here&hellip;"
-      rows="2"
-      aria-label="Your message">
-    </textarea>
-    <button
-      class="send-btn"
-      (click)="sendMessage()"
-      [disabled]="inputDisabled || !inputText.trim()"
-      aria-label="Send message">
-      Send
+  <div class="input-area" [class.input-area--disabled]="inputDisabled">
+    <textarea class="message-input" [(ngModel)]="inputText" (keydown)="onKeydown($event)" [disabled]="inputDisabled" placeholder="Describe your symptoms…" rows="2" aria-label="Your message" [attr.aria-disabled]="inputDisabled"></textarea>
+    <button class="send-btn" (click)="sendMessage()" [disabled]="inputDisabled || !inputText.trim()" aria-label="Send message">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
   </div>
 </div>

@@ -1,163 +1,225 @@
-<div class="history-container">
-  <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
+<div class="history-page">
+
+  <!-- Step indicator -->
+  <div class="step-bar" aria-label="Check-in progress">
+    <div class="step-bar__track">
+      <div class="step completed">
+        <div class="step__dot"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6l3 3 5-5"/></svg></div>
+        <span class="step__label">Welcome</span>
+      </div>
+      <div class="step completed">
+        <div class="step__dot"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6l3 3 5-5"/></svg></div>
+        <span class="step__label">Identity</span>
+      </div>
+      <div class="step active">
+        <div class="step__dot"></div>
+        <span class="step__label">History</span>
+      </div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Symptoms</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Done</span></div>
+    </div>
+  </div>
+
+  <!-- AI Disclaimer -->
   <div class="ai-disclaimer" role="alert">
-    <strong>&#9888; AI Notice:</strong>
-    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
-    A clinician will review all information.
+    <svg class="ai-disclaimer__icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+    </svg>
+    <span><strong>AI Notice:</strong> This is an AI intake assistant — not a medical diagnosis. A clinician reviews all information.</span>
   </div>
 
   <div class="history-card">
-    <h1 class="page-heading">Your Health Information</h1>
-    <p class="page-sub">Please review and confirm your records on file.</p>
+    <div class="card-header">
+      <h1 class="page-heading">Your Health Records</h1>
+      <p class="page-sub">Please review and confirm the information we have on file. Edit anything that's changed.</p>
+    </div>
 
-    <ng-container *ngIf="isLoading">
-      <p class="loading-text">Loading your records&hellip;</p>
-    </ng-container>
-
-    <ng-container *ngIf="!isLoading">
-      <div *ngIf="errorMessage" class="error-block" role="alert">
-        {{ errorMessage }}
+    <!-- Loading skeleton -->
+    <div *ngIf="isLoading" class="skeleton-list" aria-label="Loading your records" aria-busy="true">
+      <div class="skeleton-section">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-line--short"></div>
       </div>
+      <div class="skeleton-section">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-line--short"></div>
+      </div>
+      <div class="skeleton-section">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-line--short"></div>
+      </div>
+    </div>
 
-      <!-- Allergies Section -->
-      <div class="section-card" [class.section-acknowledged]="sections.allergies.acknowledged">
-        <div class="section-header">
-          <h2 class="section-title">Your Allergies</h2>
-          <span *ngIf="sections.allergies.acknowledged" class="checkmark" aria-label="Confirmed">&#10003;</span>
+    <!-- Error -->
+    <div *ngIf="errorMessage && !isLoading" class="error-block" role="alert">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Sections -->
+    <div *ngIf="!isLoading" class="sections">
+
+      <!-- Allergies -->
+      <div class="section-card">
+        <div class="section__header">
+          <div class="section__title-row">
+            <div class="section__icon section__icon--allergy" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+            </div>
+            <span class="section__title">Allergies</span>
+          </div>
+          <div *ngIf="sections.allergies.acknowledged" class="check-badge" aria-label="Confirmed">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M2 6l3 3 5-5"/></svg>
+            Confirmed
+          </div>
         </div>
 
-        <ng-container *ngIf="!sections.allergies.editing">
-          <ul *ngIf="sections.allergies.items.length > 0; else noAllergies" class="items-list">
-            <li *ngFor="let item of sections.allergies.items">{{ item }}</li>
-          </ul>
-          <ng-template #noAllergies>
-            <p class="no-records">No records on file</p>
-          </ng-template>
-          <div class="section-actions">
-            <button class="btn btn-confirm" (click)="confirmSection('allergies')" *ngIf="!sections.allergies.acknowledged">
-              Confirm
+        <div *ngIf="!sections.allergies.editing">
+          <div *ngIf="sections.allergies.items.length === 0" class="section__empty">None on record</div>
+          <div *ngIf="sections.allergies.items.length > 0" class="tag-list">
+            <span *ngFor="let item of sections.allergies.items" class="tag tag--allergy">{{ item }}</span>
+          </div>
+          <div class="section__actions">
+            <button class="btn-confirm" (click)="confirmSection('allergies')" [disabled]="sections.allergies.acknowledged">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              {{ sections.allergies.acknowledged ? 'Confirmed' : 'Looks correct' }}
             </button>
-            <button class="btn btn-edit" (click)="startEdit('allergies')">
+            <button class="btn-edit" (click)="startEdit('allergies')">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
               Edit
             </button>
           </div>
-        </ng-container>
-
-        <ng-container *ngIf="sections.allergies.editing">
-          <div *ngFor="let item of sections.allergies.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
-            <input
-              type="text"
-              class="edit-input"
-              [(ngModel)]="sections.allergies.editItems[i]"
-              [name]="'allergy-' + i"
-              placeholder="Enter allergy"
-            />
-            <button class="btn-remove" (click)="removeItem('allergies', i)" aria-label="Remove">&#10005;</button>
-          </div>
-          <button class="btn btn-add" (click)="addItem('allergies')">+ Add</button>
-          <div class="section-actions">
-            <button class="btn btn-save" (click)="saveSection('allergies')" [disabled]="sections.allergies.saving">
-              {{ sections.allergies.saving ? 'Saving&hellip;' : 'Save' }}
-            </button>
-          </div>
-        </ng-container>
-      </div>
-
-      <!-- Conditions Section -->
-      <div class="section-card" [class.section-acknowledged]="sections.conditions.acknowledged">
-        <div class="section-header">
-          <h2 class="section-title">Your Conditions</h2>
-          <span *ngIf="sections.conditions.acknowledged" class="checkmark" aria-label="Confirmed">&#10003;</span>
         </div>
 
-        <ng-container *ngIf="!sections.conditions.editing">
-          <ul *ngIf="sections.conditions.items.length > 0; else noConditions" class="items-list">
-            <li *ngFor="let item of sections.conditions.items">{{ item }}</li>
-          </ul>
-          <ng-template #noConditions>
-            <p class="no-records">No records on file</p>
-          </ng-template>
-          <div class="section-actions">
-            <button class="btn btn-confirm" (click)="confirmSection('conditions')" *ngIf="!sections.conditions.acknowledged">
-              Confirm
+        <div *ngIf="sections.allergies.editing" class="edit-panel">
+          <div class="edit-list">
+            <div *ngFor="let item of sections.allergies.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
+              <input type="text" [(ngModel)]="sections.allergies.editItems[i]" class="edit-input" placeholder="Allergy name" aria-label="Allergy item" />
+              <button class="btn-remove" (click)="removeItem('allergies', i)" aria-label="Remove this allergy">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="btn-add" (click)="addItem('allergies')">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+            Add allergy
+          </button>
+          <button class="btn-save" (click)="saveSection('allergies')" [disabled]="sections.allergies.saving">
+            {{ sections.allergies.saving ? 'Saving…' : 'Save & Confirm' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Conditions -->
+      <div class="section-card">
+        <div class="section__header">
+          <div class="section__title-row">
+            <div class="section__icon section__icon--condition" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd"/></svg>
+            </div>
+            <span class="section__title">Medical Conditions</span>
+          </div>
+          <div *ngIf="sections.conditions.acknowledged" class="check-badge" aria-label="Confirmed">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M2 6l3 3 5-5"/></svg>
+            Confirmed
+          </div>
+        </div>
+
+        <div *ngIf="!sections.conditions.editing">
+          <div *ngIf="sections.conditions.items.length === 0" class="section__empty">None on record</div>
+          <div *ngIf="sections.conditions.items.length > 0" class="tag-list">
+            <span *ngFor="let item of sections.conditions.items" class="tag tag--condition">{{ item }}</span>
+          </div>
+          <div class="section__actions">
+            <button class="btn-confirm" (click)="confirmSection('conditions')" [disabled]="sections.conditions.acknowledged">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              {{ sections.conditions.acknowledged ? 'Confirmed' : 'Looks correct' }}
             </button>
-            <button class="btn btn-edit" (click)="startEdit('conditions')">
+            <button class="btn-edit" (click)="startEdit('conditions')">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
               Edit
             </button>
           </div>
-        </ng-container>
-
-        <ng-container *ngIf="sections.conditions.editing">
-          <div *ngFor="let item of sections.conditions.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
-            <input
-              type="text"
-              class="edit-input"
-              [(ngModel)]="sections.conditions.editItems[i]"
-              [name]="'condition-' + i"
-              placeholder="Enter condition"
-            />
-            <button class="btn-remove" (click)="removeItem('conditions', i)" aria-label="Remove">&#10005;</button>
-          </div>
-          <button class="btn btn-add" (click)="addItem('conditions')">+ Add</button>
-          <div class="section-actions">
-            <button class="btn btn-save" (click)="saveSection('conditions')" [disabled]="sections.conditions.saving">
-              {{ sections.conditions.saving ? 'Saving&hellip;' : 'Save' }}
-            </button>
-          </div>
-        </ng-container>
-      </div>
-
-      <!-- Medications Section -->
-      <div class="section-card" [class.section-acknowledged]="sections.medications.acknowledged">
-        <div class="section-header">
-          <h2 class="section-title">Your Medications</h2>
-          <span *ngIf="sections.medications.acknowledged" class="checkmark" aria-label="Confirmed">&#10003;</span>
         </div>
 
-        <ng-container *ngIf="!sections.medications.editing">
-          <ul *ngIf="sections.medications.items.length > 0; else noMedications" class="items-list">
-            <li *ngFor="let item of sections.medications.items">{{ item }}</li>
-          </ul>
-          <ng-template #noMedications>
-            <p class="no-records">No records on file</p>
-          </ng-template>
-          <div class="section-actions">
-            <button class="btn btn-confirm" (click)="confirmSection('medications')" *ngIf="!sections.medications.acknowledged">
-              Confirm
+        <div *ngIf="sections.conditions.editing" class="edit-panel">
+          <div class="edit-list">
+            <div *ngFor="let item of sections.conditions.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
+              <input type="text" [(ngModel)]="sections.conditions.editItems[i]" class="edit-input" placeholder="Condition name" aria-label="Condition item" />
+              <button class="btn-remove" (click)="removeItem('conditions', i)" aria-label="Remove this condition">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="btn-add" (click)="addItem('conditions')">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+            Add condition
+          </button>
+          <button class="btn-save" (click)="saveSection('conditions')" [disabled]="sections.conditions.saving">
+            {{ sections.conditions.saving ? 'Saving…' : 'Save & Confirm' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Medications -->
+      <div class="section-card">
+        <div class="section__header">
+          <div class="section__title-row">
+            <div class="section__icon section__icon--medication" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+            </div>
+            <span class="section__title">Current Medications</span>
+          </div>
+          <div *ngIf="sections.medications.acknowledged" class="check-badge" aria-label="Confirmed">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M2 6l3 3 5-5"/></svg>
+            Confirmed
+          </div>
+        </div>
+
+        <div *ngIf="!sections.medications.editing">
+          <div *ngIf="sections.medications.items.length === 0" class="section__empty">None on record</div>
+          <div *ngIf="sections.medications.items.length > 0" class="tag-list">
+            <span *ngFor="let item of sections.medications.items" class="tag tag--medication">{{ item }}</span>
+          </div>
+          <div class="section__actions">
+            <button class="btn-confirm" (click)="confirmSection('medications')" [disabled]="sections.medications.acknowledged">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              {{ sections.medications.acknowledged ? 'Confirmed' : 'Looks correct' }}
             </button>
-            <button class="btn btn-edit" (click)="startEdit('medications')">
+            <button class="btn-edit" (click)="startEdit('medications')">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
               Edit
             </button>
           </div>
-        </ng-container>
+        </div>
 
-        <ng-container *ngIf="sections.medications.editing">
-          <div *ngFor="let item of sections.medications.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
-            <input
-              type="text"
-              class="edit-input"
-              [(ngModel)]="sections.medications.editItems[i]"
-              [name]="'medication-' + i"
-              placeholder="Enter medication"
-            />
-            <button class="btn-remove" (click)="removeItem('medications', i)" aria-label="Remove">&#10005;</button>
+        <div *ngIf="sections.medications.editing" class="edit-panel">
+          <div class="edit-list">
+            <div *ngFor="let item of sections.medications.editItems; let i = index; trackBy: trackByIndex" class="edit-row">
+              <input type="text" [(ngModel)]="sections.medications.editItems[i]" class="edit-input" placeholder="Medication name" aria-label="Medication item" />
+              <button class="btn-remove" (click)="removeItem('medications', i)" aria-label="Remove this medication">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
           </div>
-          <button class="btn btn-add" (click)="addItem('medications')">+ Add</button>
-          <div class="section-actions">
-            <button class="btn btn-save" (click)="saveSection('medications')" [disabled]="sections.medications.saving">
-              {{ sections.medications.saving ? 'Saving&hellip;' : 'Save' }}
-            </button>
-          </div>
-        </ng-container>
+          <button class="btn-add" (click)="addItem('medications')">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+            Add medication
+          </button>
+          <button class="btn-save" (click)="saveSection('medications')" [disabled]="sections.medications.saving">
+            {{ sections.medications.saving ? 'Saving…' : 'Save & Confirm' }}
+          </button>
+        </div>
       </div>
 
-      <!-- Proceed Button -->
-      <button
-        class="btn btn-proceed"
-        (click)="proceed()"
-        [disabled]="!allAcknowledged">
-        {{ allAcknowledged ? 'Proceed to Check-In' : 'Confirm all sections to proceed' }}
-      </button>
-    </ng-container>
+    </div>
+
+    <button class="btn-proceed" [disabled]="!allAcknowledged || isLoading" (click)="proceed()">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      Continue to Symptom Check
+    </button>
   </div>
 </div>

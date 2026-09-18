@@ -79,6 +79,10 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.activeFilter = filter;
   }
 
+  countByUrgency(level: string): number {
+    return this.queue.filter(item => item.urgencyLevel === level).length;
+  }
+
   get filteredQueue(): QueueItem[] {
     if (this.activeFilter === 'all') {
       return this.queue;

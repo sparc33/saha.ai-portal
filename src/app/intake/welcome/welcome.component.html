@@ -1,37 +1,56 @@
-<div class="welcome-container">
+<div class="welcome-page">
+
+  <!-- Step indicator -->
+  <div class="step-bar" aria-label="Check-in progress">
+    <div class="step-bar__track">
+      <div class="step active"><div class="step__dot"></div><span class="step__label">Welcome</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Identity</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">History</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Symptoms</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Done</span></div>
+    </div>
+  </div>
+
   <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
-  <div class="ai-disclaimer" role="alert">
-    <strong>&#9888; AI Notice:</strong>
-    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
-    A clinician will review all information.
+  <div class="ai-disclaimer" role="alert" aria-live="polite">
+    <svg class="ai-disclaimer__icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+    </svg>
+    <span><strong>AI Notice:</strong> This is an AI intake assistant — not a medical diagnosis. A clinician reviews all information.</span>
   </div>
 
   <div class="welcome-card">
-    <div class="clinic-logo" aria-hidden="true">&#9829;</div>
-
     <ng-container *ngIf="isLoading">
+      <div class="hero-icon hero-icon--loading" aria-hidden="true"><div class="spinner"></div></div>
       <p class="loading-text">Preparing your check-in&hellip;</p>
     </ng-container>
 
     <ng-container *ngIf="!isLoading && !errorMessage">
-      <h1 class="welcome-heading">Welcome to {{ clinicName }} Check-In</h1>
-      <p class="welcome-sub">
-        Before you see your clinician, our AI assistant will ask a few questions
-        about what brings you in today.
-      </p>
-      <button
-        class="btn btn-primary"
-        (click)="beginCheckIn()"
-        [disabled]="isLoading">
+      <div class="hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" fill="#dbeafe"/>
+          <path d="M24 14v10m0 0v10m0-10h10m-10 0H14" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="welcome-heading">Welcome to<br><span class="clinic-name">{{ clinicName }}</span></h1>
+      <p class="welcome-sub">Our AI assistant will ask a few questions about your visit before you see your clinician. This takes about <strong>3–5 minutes</strong>.</p>
+      <button class="btn-begin" (click)="beginCheckIn()" [disabled]="isLoading">
         Begin Check-In
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
       </button>
     </ng-container>
 
     <ng-container *ngIf="!isLoading && errorMessage">
+      <div class="hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" fill="#fef2f2"/><path d="M24 14v12M24 32v2" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </div>
       <p class="error-message" role="alert">{{ errorMessage }}</p>
-      <button class="btn btn-secondary" (click)="createSession()">
-        Try Again
-      </button>
+      <button class="btn-begin btn-begin--secondary" (click)="createSession()">Try Again</button>
     </ng-container>
   </div>
+
+  <p class="privacy-note">
+    <svg viewBox="0 0 16 16" fill="currentColor" class="privacy-note__icon" aria-hidden="true"><path fill-rule="evenodd" d="M8 1a3.5 3.5 0 00-3.5 3.5V6H4a1 1 0 00-1 1v7a1 1 0 001 1h8a1 1 0 001-1V7a1 1 0 00-1-1h-.5V4.5A3.5 3.5 0 008 1zm2.5 5V4.5a2.5 2.5 0 00-5 0V6h5z" clip-rule="evenodd"/></svg>
+    Your information is kept private and only shared with your care team.
+  </p>
 </div>

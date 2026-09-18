@@ -1,77 +1,149 @@
-<div class="queue-container">
-  <!-- Header -->
-  <div class="queue-header">
-    <h1 class="queue-title">{{ clinicName }} &mdash; Clinician Queue</h1>
-    <span class="last-refreshed" *ngIf="lastRefreshed">
-      Last updated: {{ lastRefreshed | date:'h:mm:ss a' }}
-    </span>
-  </div>
+<div class="queue-page">
 
-  <!-- Filter Tabs -->
-  <div class="filter-tabs" role="tablist">
-    <button
-      *ngFor="let tab of filterTabs"
-      class="filter-tab"
-      [class.filter-tab--active]="activeFilter === tab.value"
-      [attr.data-urgency]="tab.value"
-      (click)="setFilter(tab.value)"
-      role="tab"
-      [attr.aria-selected]="activeFilter === tab.value">
-      {{ tab.label }}
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <svg class="topbar__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5v4m0 0v4m0-4h4m-4 0H8"/>
+      </svg>
+      <div class="topbar__titles">
+        <span class="topbar__name">{{ clinicName }}</span>
+        <span class="topbar__sub">Clinician Dashboard</span>
+      </div>
+    </div>
+    <div class="topbar__meta">
+      <div class="live-indicator" aria-label="Auto-refreshing">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span class="live-label">Live</span>
+      </div>
+      <span *ngIf="lastRefreshed" class="refresh-time">
+        Updated {{ lastRefreshed | date:'h:mm a' }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Stats row -->
+  <div class="stats-row" role="region" aria-label="Queue summary">
+    <button class="stat-card stat-card--emergency" [class.stat-card--active]="activeFilter === 'emergency'" (click)="setFilter('emergency')" aria-label="Filter by emergency">
+      <span class="stat-card__count">{{ countByUrgency('emergency') }}</span>
+      <span class="stat-card__label">Emergency</span>
+      <div class="stat-card__dot stat-card__dot--emergency" aria-hidden="true"></div>
+    </button>
+    <button class="stat-card stat-card--urgent" [class.stat-card--active]="activeFilter === 'urgent'" (click)="setFilter('urgent')" aria-label="Filter by urgent">
+      <span class="stat-card__count">{{ countByUrgency('urgent') }}</span>
+      <span class="stat-card__label">Urgent</span>
+      <div class="stat-card__dot stat-card__dot--urgent" aria-hidden="true"></div>
+    </button>
+    <button class="stat-card stat-card--routine" [class.stat-card--active]="activeFilter === 'routine'" (click)="setFilter('routine')" aria-label="Filter by routine">
+      <span class="stat-card__count">{{ countByUrgency('routine') }}</span>
+      <span class="stat-card__label">Routine</span>
+      <div class="stat-card__dot stat-card__dot--routine" aria-hidden="true"></div>
+    </button>
+    <button class="stat-card stat-card--all" [class.stat-card--active]="activeFilter === 'all'" (click)="setFilter('all')" aria-label="Show all patients">
+      <span class="stat-card__count">{{ queue.length }}</span>
+      <span class="stat-card__label">All Patients</span>
+      <div class="stat-card__dot stat-card__dot--all" aria-hidden="true"></div>
     </button>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-text">Loading queue&hellip;</div>
+  <!-- Filter bar -->
+  <nav class="filter-bar" aria-label="Urgency filter">
+    <button *ngFor="let tab of filterTabs"
+      class="filter-tab"
+      [class.filter-tab--active]="activeFilter === tab.value"
+      [class.filter-tab--emergency]="tab.value === 'emergency' && activeFilter === 'emergency'"
+      [class.filter-tab--urgent]="tab.value === 'urgent' && activeFilter === 'urgent'"
+      [class.filter-tab--routine]="tab.value === 'routine' && activeFilter === 'routine'"
+      (click)="setFilter(tab.value)"
+      [attr.aria-pressed]="activeFilter === tab.value"
+      [attr.aria-label]="tab.label">
+      {{ tab.label }}
+      <span *ngIf="tab.value !== 'all'" class="filter-tab__badge">{{ countByUrgency(tab.value) }}</span>
+      <span *ngIf="tab.value === 'all'" class="filter-tab__badge">{{ queue.length }}</span>
+    </button>
+  </nav>
 
-  <!-- Error State -->
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="skeleton-queue" aria-label="Loading queue" aria-busy="true">
+    <div *ngFor="let n of [1,2,3,4,5]" class="skeleton-row">
+      <div class="skeleton-cell skeleton-cell--pill"></div>
+      <div class="skeleton-cell"></div>
+      <div class="skeleton-cell skeleton-cell--wide"></div>
+      <div class="skeleton-cell skeleton-cell--short"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
   <div *ngIf="errorMessage && !isLoading" class="error-block" role="alert">
+    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
     {{ errorMessage }}
   </div>
 
-  <!-- Queue Table -->
-  <ng-container *ngIf="!isLoading">
-    <div *ngIf="filteredQueue.length === 0" class="empty-state">
-      No completed intakes yet.
+  <!-- Queue body -->
+  <div *ngIf="!isLoading && !errorMessage" class="queue-body">
+
+    <!-- Empty state -->
+    <div *ngIf="filteredQueue.length === 0" class="empty-state" aria-live="polite">
+      <svg class="empty-state__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="8" y="8" width="32" height="36" rx="3"/>
+        <path d="M16 18h16M16 24h12M16 30h8"/>
+        <circle cx="36" cy="36" r="8" fill="var(--c-bg)" stroke="var(--c-border)" stroke-width="1.5"/>
+        <path d="M33 36l2 2 4-4" stroke="var(--c-success)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p class="empty-state__title">No patients in this category</p>
+      <p class="empty-state__desc">{{ activeFilter === 'all' ? 'The queue is currently empty.' : 'No ' + activeFilter + ' cases at this time.' }}</p>
     </div>
 
-    <table *ngIf="filteredQueue.length > 0" class="queue-table">
-      <thead>
-        <tr>
-          <th>Urgency</th>
-          <th>Patient Type</th>
-          <th>Chief Complaint</th>
-          <th>Time In</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let item of filteredQueue"
-          class="queue-row"
-          (click)="openNote(item.sessionId)"
-          tabindex="0"
-          (keydown.enter)="openNote(item.sessionId)"
-          role="button"
-          [attr.aria-label]="'View note for session ' + item.sessionId">
-          <td>
-            <span
-              class="urgency-badge"
-              [ngStyle]="{ 'background-color': urgencyColor(item.urgencyLevel) }">
-              {{ urgencyLabel(item.urgencyLevel) }}
-            </span>
-          </td>
-          <td class="patient-type">{{ item.patientType === 'returning' ? 'Returning' : 'New' }}</td>
-          <td class="chief-complaint">{{ item.chiefComplaint || '—' }}</td>
-          <td class="time-in">{{ formatTime(item.createdAt) }}</td>
-          <td class="queue-status">{{ item.queueStatus }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </ng-container>
-
-  <!-- Disclaimer Footer -->
-  <div class="disclaimer-footer">
-    All information is AI-generated decision support. Clinician review required.
+    <!-- Queue table -->
+    <div *ngIf="filteredQueue.length > 0" class="queue-table-wrap">
+      <table class="queue-table" aria-label="Patient intake queue">
+        <thead>
+          <tr>
+            <th scope="col">Urgency</th>
+            <th scope="col">Patient</th>
+            <th scope="col" class="col-complaint">Chief Complaint</th>
+            <th scope="col" class="col-time">Time</th>
+            <th scope="col">Status</th>
+            <th scope="col" aria-label="Open note"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredQueue"
+            class="queue-row"
+            [class.queue-row--emergency]="item.urgencyLevel === 'emergency'"
+            (click)="openNote(item.sessionId)"
+            tabindex="0"
+            (keydown.enter)="openNote(item.sessionId)"
+            [attr.aria-label]="'Open note for patient, urgency: ' + urgencyLabel(item.urgencyLevel)">
+            <td>
+              <span class="urgency-pill" [class.urgency-pill--emergency]="item.urgencyLevel === 'emergency'"
+                [class.urgency-pill--urgent]="item.urgencyLevel === 'urgent'"
+                [class.urgency-pill--routine]="item.urgencyLevel === 'routine'">
+                <span class="urgency-pill__dot" aria-hidden="true"></span>
+                {{ urgencyLabel(item.urgencyLevel) }}
+              </span>
+            </td>
+            <td>
+              <span class="patient-chip" [class.patient-chip--returning]="item.patientType === 'returning'" [class.patient-chip--new]="item.patientType === 'new'">
+                {{ item.patientType === 'returning' ? 'Returning' : 'New' }}
+              </span>
+            </td>
+            <td class="complaint-cell col-complaint">{{ item.chiefComplaint || '—' }}</td>
+            <td class="time-cell col-time">{{ formatTime(item.createdAt) }}</td>
+            <td class="status-text">{{ item.queueStatus }}</td>
+            <td class="row-arrow" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="queue-footer" role="contentinfo">
+    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+    <span>AI-generated intake summaries — clinician review required before any clinical decision.</span>
+  </footer>
+
 </div>

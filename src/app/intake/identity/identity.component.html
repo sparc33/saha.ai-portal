@@ -1,88 +1,104 @@
-<div class="identity-container">
+<div class="identity-page">
+
+  <!-- Step indicator -->
+  <div class="step-bar" aria-label="Check-in progress">
+    <div class="step-bar__track">
+      <div class="step completed">
+        <div class="step__dot"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6l3 3 5-5"/></svg></div>
+        <span class="step__label">Welcome</span>
+      </div>
+      <div class="step active">
+        <div class="step__dot"></div>
+        <span class="step__label">Identity</span>
+      </div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">History</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Symptoms</span></div>
+      <div class="step"><div class="step__dot"></div><span class="step__label">Done</span></div>
+    </div>
+  </div>
+
   <!-- AI Disclaimer — always rendered unconditionally, never inside *ngIf -->
   <div class="ai-disclaimer" role="alert">
-    <strong>&#9888; AI Notice:</strong>
-    This is an AI clinical intake assistant. This is <strong>NOT</strong> a medical diagnosis.
-    A clinician will review all information.
+    <svg class="ai-disclaimer__icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+    </svg>
+    <span><strong>AI Notice:</strong> This is an AI intake assistant — not a medical diagnosis. A clinician reviews all information.</span>
   </div>
 
   <div class="identity-card">
-    <h1 class="page-heading">Let's Check You In</h1>
-    <p class="page-sub">
-      If you've visited us before, we can pre-fill some information for you.
-    </p>
+    <div class="card-header">
+      <h1 class="page-heading">Let's Check You In</h1>
+      <p class="page-sub">If you've visited before, we can pre-fill your information.</p>
+    </div>
 
     <form [formGroup]="identityForm" (ngSubmit)="onSubmit()" novalidate>
+
       <!-- Date of Birth -->
-      <div class="form-group">
-        <label for="dateOfBirth" class="form-label">Date of Birth</label>
-        <input
-          id="dateOfBirth"
-          type="date"
-          formControlName="dateOfBirth"
-          class="form-input"
-          [class.input-error]="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched"
-          aria-required="true"
-        />
-        <span
-          *ngIf="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched"
-          class="field-error">
-          Date of birth is required.
-        </span>
+      <div class="form-group" [class.form-group--error]="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched">
+        <label for="dateOfBirth" class="form-label">
+          <svg viewBox="0 0 20 20" fill="currentColor" class="label-icon" aria-hidden="true">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+          </svg>
+          Date of Birth
+        </label>
+        <input id="dateOfBirth" type="date" formControlName="dateOfBirth" class="form-input" aria-required="true" [attr.aria-invalid]="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched" />
+        <span *ngIf="identityForm.get('dateOfBirth')?.invalid && identityForm.get('dateOfBirth')?.touched" class="field-error" role="alert">Date of birth is required.</span>
       </div>
 
-      <!-- Identifier Type Radio -->
+      <!-- Identifier Type — card radio buttons -->
       <div class="form-group">
-        <fieldset class="radio-group">
-          <legend class="form-label">Identify With</legend>
-          <label class="radio-label">
-            <input type="radio" formControlName="identifierType" value="mrNumber" />
-            Medical Record Number
-          </label>
-          <label class="radio-label">
-            <input type="radio" formControlName="identifierType" value="phone" />
-            Phone Number
-          </label>
+        <fieldset class="radio-fieldset">
+          <legend class="form-label">
+            <svg viewBox="0 0 20 20" fill="currentColor" class="label-icon" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+            </svg>
+            Identify With
+          </legend>
+          <div class="radio-cards">
+            <label class="radio-card" [class.radio-card--selected]="identityForm.get('identifierType')?.value === 'mrNumber'">
+              <input type="radio" formControlName="identifierType" value="mrNumber" class="sr-only" />
+              <div class="radio-card__content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="radio-card__icon" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                <span class="radio-card__title">Medical Record No.</span>
+                <span class="radio-card__sub">MR number from your card</span>
+              </div>
+              <div class="radio-card__check" aria-hidden="true"></div>
+            </label>
+            <label class="radio-card" [class.radio-card--selected]="identityForm.get('identifierType')?.value === 'phone'">
+              <input type="radio" formControlName="identifierType" value="phone" class="sr-only" />
+              <div class="radio-card__content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="radio-card__icon" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                <span class="radio-card__title">Phone Number</span>
+                <span class="radio-card__sub">Number on file with us</span>
+              </div>
+              <div class="radio-card__check" aria-hidden="true"></div>
+            </label>
+          </div>
         </fieldset>
       </div>
 
-      <!-- Conditional Identifier Input -->
-      <div class="form-group">
+      <!-- Identifier Input -->
+      <div class="form-group" [class.form-group--error]="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched">
         <label for="identifier" class="form-label">{{ identifierLabel }}</label>
-        <input
-          id="identifier"
-          type="text"
-          formControlName="identifier"
-          class="form-input"
-          [placeholder]="identifierPlaceholder"
-          [class.input-error]="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched"
-          aria-required="true"
-        />
-        <span
-          *ngIf="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched"
-          class="field-error">
-          {{ identifierLabel }} is required.
-        </span>
+        <input id="identifier" type="text" formControlName="identifier" class="form-input" [placeholder]="identifierPlaceholder" aria-required="true" [attr.aria-invalid]="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched" />
+        <span *ngIf="identityForm.get('identifier')?.invalid && identityForm.get('identifier')?.touched" class="field-error" role="alert">{{ identifierLabel }} is required.</span>
       </div>
 
-      <!-- Error Block — generic only, PHI-safe -->
+      <!-- Generic error -->
       <div *ngIf="errorMessage" class="error-block" role="alert">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
         {{ errorMessage }}
       </div>
 
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="isSubmitting">
-        {{ isSubmitting ? 'Checking&hellip;' : 'Continue' }}
+      <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+        <span *ngIf="!isSubmitting">Continue</span>
+        <span *ngIf="isSubmitting" class="btn-submit__loading"><span class="btn-spinner"></span> Checking&hellip;</span>
       </button>
     </form>
 
-    <button
-      type="button"
-      class="skip-link"
-      (click)="skipToChat()">
-      Skip (first visit)
+    <button type="button" class="skip-btn" (click)="skipToChat()">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+      Skip — this is my first visit
     </button>
   </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, SlicePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IntakeService, PatientNoteData } from '../../services/intake.service';
 
@@ -16,7 +16,7 @@ import { IntakeService, PatientNoteData } from '../../services/intake.service';
 @Component({
   selector: 'app-note',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SlicePipe],
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss']
 })
